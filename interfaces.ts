@@ -38,3 +38,7 @@ export interface IsraeliScrapper {
 export interface Publisher {
     publish(date: Date, description: string, chargedAmount: number)
 }
+
+export interface Logger {
+    log(error: string, severity: 'info'| 'debug' | 'error')
+}

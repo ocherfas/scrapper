@@ -1,7 +1,7 @@
-import { expect, assert } from 'chai';
+import { assert } from 'chai';
 import 'mocha';
 import {IntervalScrapper} from '../scrapper'
-import {ScrapeTime, IsraeliScrapper, Publisher, ScrapeResult, Transaction} from '../interfaces'
+import {ScrapeTime, IsraeliScrapper, Publisher, ScrapeResult, Transaction, Logger} from '../interfaces'
 import sinon, { stubInterface } from "ts-sinon";
 
 describe('Scrapper Tests', 
@@ -10,6 +10,7 @@ describe('Scrapper Tests',
     const scrapeTimeStub = stubInterface<ScrapeTime>()
     const scrapperStub = stubInterface<IsraeliScrapper>()
     const publisherStub = stubInterface<Publisher>()   
+    const logger = stubInterface<Logger>()
     const options = {}
     const credentials = {username: "", password: ""}
 
@@ -26,7 +27,7 @@ describe('Scrapper Tests',
 
         scrapeTimeStub1.getLastScrapeTime.returns(datePromise)
 
-        const scrapperInterval = new IntervalScrapper(options1, scrapeTimeStub1, scrapperStub1, credentials, publisherStub)
+        const scrapperInterval = new IntervalScrapper(options1, scrapeTimeStub1, scrapperStub1, credentials, publisherStub, logger)
         await scrapperInterval.scrape()
 
         const rightCall = scrapperStub1.scrape.calledOnceWithExactly({...options1, startDate: date}, credentials)
@@ -47,7 +48,7 @@ describe('Scrapper Tests',
     const clock = sinon.useFakeTimers({now: scrapeDate})
 
     scrapperStub1.scrape.returns(scrapeResultPromise)
-    const scrapperInterval = new IntervalScrapper(options, scrapeTimeStub1, scrapperStub1, credentials, publisherStub)
+    const scrapperInterval = new IntervalScrapper(options, scrapeTimeStub1, scrapperStub1, credentials, publisherStub, logger)
     await scrapperInterval.scrape()
 
     assert.equal(scrapeTimeStub1.saveLastScrapeTime.calledOnceWith(scrapeDate), true)
@@ -104,7 +105,7 @@ describe('Scrapper Tests',
 
     scrapperStub1.scrape.returns(scrapeResultPromise)
 
-    const scrapperInterval = new IntervalScrapper(options, scrapeTimeStub, scrapperStub1, credentials, publisherStub1)
+    const scrapperInterval = new IntervalScrapper(options, scrapeTimeStub, scrapperStub1, credentials, publisherStub1, logger)
     await scrapperInterval.scrape()
 
     const firstPublishOK = publisherStub1.publish.firstCall && publisherStub1.publish.firstCall.calledWithExactly(firstDate, firstTransaction.description, firstTransaction.chargedAmount)
@@ -150,19 +151,81 @@ describe('Scrapper Tests',
     scrapperStub1.scrape.returns(scrapeResultPromise)
 
     const clock = sinon.useFakeTimers({now: firstDate})
-    const scrapperInterval = new IntervalScrapper(options, scrapeTimeSub1, scrapperStub1, credentials, publisherStub)
+    const scrapperInterval = new IntervalScrapper(options, scrapeTimeSub1, scrapperStub1, credentials, publisherStub, logger)
     await scrapperInterval.scrape()
     clock.restore()
 
     assert(scrapeTimeSub1.saveLastScrapeTime.calledOnceWithExactly(laterDate))
  }); 
   it('If failed to get transaction, do not update last scrape time and log error', async () => {
-    // TODO
+    const logger1 = stubInterface<Logger>()
+    const scrapper1 = stubInterface<IsraeliScrapper>()
+    const scrapeTime1 = stubInterface<ScrapeTime>()
+
+    scrapper1.scrape.returns(new Promise<ScrapeResult>((resolve) => {
+      resolve({
+        success: false,
+        errorType: "invalidPassword" 
+      })
+    }))
+
+    const scrapperInterval = new IntervalScrapper(options, scrapeTime1, scrapper1, credentials, publisherStub, logger1)
+    await scrapperInterval.scrape()
+
+    assert(scrapeTime1.saveLastScrapeTime.notCalled)
+    assert(logger.log.calledWith(sinon.match.any, 'error'))
  }); 
-  it('If failed to get last scrape time, log error', async () => {
-    // TODO
+  it('If failed to get last scrape time, log error and don\'t scrape', async () => {
+    const logger1 = stubInterface<Logger>()
+    const scrapper1 = stubInterface<IsraeliScrapper>()
+    const scrapeTime1 = stubInterface<ScrapeTime>()
+
+    scrapeTime1.getLastScrapeTime.throws('some error')
+
+    const scrapperInterval = new IntervalScrapper(options, scrapeTime1, scrapper1, credentials, publisherStub, logger1)
+    await scrapperInterval.scrape()
+
+    assert(scrapper1.scrape.notCalled)
+    assert(logger.log.calledWith(sinon.match.any, 'error'))
   }); 
   it('if failed to update last scrape time, log error', async () => {
-    // TODO
+    const logger1 = stubInterface<Logger>()
+    const scrapper1 = stubInterface<IsraeliScrapper>()
+    const scrapeTime1 = stubInterface<ScrapeTime>()
+
+    const transaction: Transaction = {
+      type: 'normal',
+      date: new Date().toISOString(), // ISO date string
+      processedDate: "", // ISO date string
+      originalAmount: 20,
+      originalCurrency: "",
+      chargedAmount: 100,
+      description: "first transaction",
+      installments: {
+          number: 10, // the current installment number
+          total: 20, // the total number of installments
+      },
+      status: 'completed'
+    }
+
+    const scrapeResultPromise = new Promise<ScrapeResult>((resolve) => {
+      resolve({
+        success: true,
+        accounts: [{
+          accountNumber: "",
+          txns: [
+            transaction
+          ]
+        }]
+      })
+    }) 
+
+    scrapeTime1.saveLastScrapeTime.throws('some error')
+    scrapper1.scrape.returns(scrapeResultPromise)
+
+    const scrapperInterval = new IntervalScrapper(options, scrapeTime1, scrapper1, credentials, publisherStub, logger1)
+    await scrapperInterval.scrape()
+
+    assert(logger.log.calledWith(sinon.match.any, 'error'))
   }); 
 });
