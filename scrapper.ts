@@ -9,6 +9,7 @@ class IntervalScrapper {
     credentials: Credentials
     publisher: Publisher
     logger: Logger
+    initialScrapeTime: Date
 
     constructor(
         options: any, 
@@ -16,7 +17,8 @@ class IntervalScrapper {
         israeliScrapper: IsraeliScrapper, 
         credentials: Credentials, 
         publisher: Publisher,
-        logger: Logger
+        logger: Logger,
+        initialScrapeTime: Date
     ){
         this.options = options
         this.scrapeTime =  scrapeTime
@@ -24,6 +26,7 @@ class IntervalScrapper {
         this.credentials = credentials
         this.publisher = publisher
         this.logger = logger
+        this.initialScrapeTime = initialScrapeTime
     }
 
     async scrape(){
@@ -34,6 +37,10 @@ class IntervalScrapper {
         } catch (error) {
             this.logger.log(`Could not get last scrape time due to: ${error}`, 'error')
             return
+        }
+
+        if (!lastScrapeTime) {
+            lastScrapeTime = this.initialScrapeTime
         }
         
         const currentDate = new Date()
