@@ -10,9 +10,8 @@ describe('scrapeTime tests - getLastScrapeTimeTest',
             sinon.restore()
         })
         it('if file does not exists return null', async () => {
-            const stub = ImportMock.mockFunction(fs.promises, 'access', new Promise<any>(() => {
-                throw new Error('some error')
-            }))
+            const stub = ImportMock.mockFunction(fs.promises, 'access')
+            stub.throwsException()
 
             const scrapeTime = new ScrapeTime("")
             const lastScrapeTime = await scrapeTime.getLastScrapeTime()
@@ -58,6 +57,31 @@ describe('scrapeTime tests - getLastScrapeTimeTest',
             const result = await scrapeTime.getLastScrapeTime()
             
             assert.equal(result, date)
+        })
+        it('use provided path and object to save last scrape time', async () => {
+            const path = "test-path"
+            const date = new Date()
+            const writeJsonStub = ImportMock.mockFunction(fs, 'writeJSON')
+
+            const scrapeTime = new ScrapeTime(path)
+            await scrapeTime.saveLastScrapeTime(date)
+
+            assert(writeJsonStub.calledWith(path, date, sinon.match.any))
+        })
+        it('if error from writing the json, throw error', async () => {
+            const writeJsonStub = ImportMock.mockFunction(fs, 'writeJSON')
+            const scrapeTime = new ScrapeTime("")
+            writeJsonStub.throwsException()
+
+            let thrown 
+            try{
+                await scrapeTime.saveLastScrapeTime(new Date())
+                thrown = false
+            } catch (error) {
+                thrown = true
+            }    
+            
+            assert(thrown)
         })
     }
 )

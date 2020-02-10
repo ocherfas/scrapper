@@ -22,6 +22,7 @@ export default class ScrapeTime implements IScrapeTime {
     }
 
     async saveLastScrapeTime(date: Date){
+        await fs.writeJSON(this.lastScrapeTimeFile, date, {})
     }
 }
  
