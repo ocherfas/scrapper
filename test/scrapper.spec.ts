@@ -14,24 +14,24 @@ describe('Scrapper Tests',
     const options = {}
     const credentials = {username: "", password: ""}
 
-    it('should scrape with last scrape time in options object, and user correct options and credentials', async () => { 
-        const scrapeTimeStub1 = stubInterface<ScrapeTime>()
-        const scrapperStub1 = stubInterface<IsraeliScrapper>()
-        const options1 = {key: "value"}
-        const credentials = {username: "some-user", password: "some-password"}
+  it('should scrape with last scrape time in options object, and user correct options and credentials', async () => { 
+    const scrapeTimeStub1 = stubInterface<ScrapeTime>()
+    const scrapperStub1 = stubInterface<IsraeliScrapper>()
+    const options1 = {key: "value"}
+    const credentials = {username: "some-user", password: "some-password"}
 
-        const date = new Date()
-        const datePromise = new Promise<Date>((resolve) => {
-          resolve(date)
-        })
+    const date = new Date()
+    const datePromise = new Promise<Date>((resolve) => {
+      resolve(date)
+    })
 
-        scrapeTimeStub1.getLastScrapeTime.returns(datePromise)
+    scrapeTimeStub1.getLastScrapeTime.returns(datePromise)
 
-        const scrapperInterval = new IntervalScrapper(options1, scrapeTimeStub1, scrapperStub1, credentials, publisherStub, logger)
-        await scrapperInterval.scrape()
+    const scrapperInterval = new IntervalScrapper(options1, scrapeTimeStub1, scrapperStub1, credentials, publisherStub, logger)
+    await scrapperInterval.scrape()
 
-        const rightCall = scrapperStub1.scrape.calledOnceWithExactly({...options1, startDate: date}, credentials)
-        assert.equal(rightCall, true)
+    const rightCall = scrapperStub1.scrape.calledOnceWithExactly({...options1, startDate: date}, credentials)
+    assert.equal(rightCall, true)
   });
   it('On success scraping: should save the time before the scrape', async () => {
     const scrapeTimeStub1 = stubInterface<ScrapeTime>()
@@ -54,7 +54,7 @@ describe('Scrapper Tests',
     assert.equal(scrapeTimeStub1.saveLastScrapeTime.calledOnceWith(scrapeDate), true)
     clock.restore()
   }); 
-  it('On success scraping: should publish all transactions received ordered by the time received', async () => {
+  it('On success scraping: should publish all transactions received, ordered by the time received', async () => {
     const scrapperStub1 = stubInterface<IsraeliScrapper>()
     const publisherStub1 = stubInterface<Publisher>()
     const firstDate = new Date()
