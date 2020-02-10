@@ -1,23 +1,23 @@
-import {ScrapeTime, IsraeliScrapper, Credentials, Publisher, Logger} from './interfaces'
+import {IScrapeTime, IIsraeliScrapper, Credentials, IPublisher, ILogger} from './interfaces'
 import {orderBy, last} from 'lodash'
 
 
 class IntervalScrapper {
     options: any
-    scrapeTime: ScrapeTime
-    israeliScrapper: IsraeliScrapper
+    scrapeTime: IScrapeTime
+    israeliScrapper: IIsraeliScrapper
     credentials: Credentials
-    publisher: Publisher
-    logger: Logger
+    publisher: IPublisher
+    logger: ILogger
     initialScrapeTime: Date
 
     constructor(
         options: any, 
-        scrapeTime: ScrapeTime, 
-        israeliScrapper: IsraeliScrapper, 
+        scrapeTime: IScrapeTime, 
+        israeliScrapper: IIsraeliScrapper, 
         credentials: Credentials, 
-        publisher: Publisher,
-        logger: Logger,
+        publisher: IPublisher,
+        logger: ILogger,
         initialScrapeTime: Date
     ){
         this.options = options

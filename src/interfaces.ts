@@ -1,4 +1,4 @@
-export interface ScrapeTime {
+export interface IScrapeTime {
     getLastScrapeTime(): Promise<Date>
     saveLastScrapeTime(scrapeTime: Date): Promise<void>
 }
@@ -31,14 +31,14 @@ export type ScrapeResult = {
     errorMessage?: string, // only on success=false
 }
 
-export interface IsraeliScrapper {
+export interface IIsraeliScrapper {
     scrape(options: any, credentials: Credentials): Promise<ScrapeResult>
 }
 
-export interface Publisher {
+export interface IPublisher {
     publish(date: Date, description: string, chargedAmount: number)
 }
 
-export interface Logger {
+export interface ILogger {
     log(error: string, severity: 'info'| 'debug' | 'error')
 }
