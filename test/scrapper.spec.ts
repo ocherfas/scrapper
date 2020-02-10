@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import 'mocha';
-import {IntervalScrapper} from '../scrapper'
-import {ScrapeTime, IsraeliScrapper, Publisher, ScrapeResult, Transaction, Logger} from '../interfaces'
+import {IntervalScrapper} from '../src/scrapper'
+import {ScrapeTime, IsraeliScrapper, Publisher, ScrapeResult, Transaction, Logger} from '../src/interfaces'
 import sinon, { stubInterface } from "ts-sinon";
 
 describe('Scrapper Tests', 
