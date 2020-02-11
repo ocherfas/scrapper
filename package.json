@@ -12,10 +12,12 @@
     "@types/fs-extra": "^8.0.1",
     "@types/lodash": "^4.14.149",
     "@types/node": "^13.7.0",
+    "@types/sendmail": "^1.4.2",
     "dotenv": "^8.2.0",
     "fs-extra": "^8.1.0",
     "israeli-bank-scrapers": "^0.8.0",
     "lodash": "^4.17.15",
+    "sendmail": "^1.6.1",
     "ts-node": "^8.6.2",
     "ts-node-dev": "^1.0.0-pre.44",
     "typescript": "^3.7.5"

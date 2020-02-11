@@ -241,5 +241,8 @@ describe('Scrapper Tests',
     await scrapperInterval.scrape()
 
     assert(scrapper1.scrape.calledOnceWithExactly({...options, startDate: initialScrapeTime}, credentials))
-  }); 
+  });
+  it('if publish fail for one of the transactions, should save the previous date ', async () => {
+    // TODO
+  })
 });
