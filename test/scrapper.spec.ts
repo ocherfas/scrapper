@@ -34,7 +34,7 @@ describe('Scrapper Tests',
     const rightCall = scrapperStub1.scrape.calledOnceWithExactly({...options1, startDate: date}, credentials)
     assert.equal(rightCall, true)
   });
-  it('On success scraping: should save the time before the scrape', async () => {
+  it('On success scraping and no transactions, should save the time before the scrape', async () => {
     const scrapeTimeStub1 = stubInterface<IScrapeTime>()
     const scrapperStub1 = stubInterface<IIsraeliScrapper>()
     const scrapeDate = new Date()
@@ -115,14 +115,28 @@ describe('Scrapper Tests',
     assert.equal(firstPublishOK, true)
     assert.equal(secondPublishOK, true)
   }); 
-  it('On success scraping, and got transaction after time of scrapping, should save time of last transaction', async () => {
+  it('On success scraping, and got transactions should save time of last transaction', async () => {
     const scrapperStub1 = stubInterface<IIsraeliScrapper>()
     const scrapeTimeSub1 = stubInterface<IScrapeTime>()
 
     const firstDate = new Date()
     const laterDate = new Date(firstDate)
     laterDate.setSeconds(laterDate.getSeconds() + 20)
-    const transaction: Transaction = {
+    const firstTransaction: Transaction = {
+      type: 'normal',
+      date: laterDate.toISOString(), // ISO date string
+      processedDate: "", // ISO date string
+      originalAmount: 20,
+      originalCurrency: "",
+      chargedAmount: 100,
+      description: "first transaction",
+      installments: {
+          number: 10, // the current installment number
+          total: 20, // the total number of installments
+      },
+      status: 'completed'
+    }
+    const laterTransaction: Transaction = {
       type: 'normal',
       date: laterDate.toISOString(), // ISO date string
       processedDate: "", // ISO date string
@@ -143,7 +157,7 @@ describe('Scrapper Tests',
         accounts: [{
           accountNumber: "",
           txns: [
-            transaction
+            laterTransaction, firstTransaction
           ]
         }]
       })
@@ -151,10 +165,8 @@ describe('Scrapper Tests',
 
     scrapperStub1.scrape.returns(scrapeResultPromise)
 
-    const clock = sinon.useFakeTimers({now: firstDate})
     const scrapperInterval = new IntervalScrapper(options, scrapeTimeSub1, scrapperStub1, credentials, publisherStub, logger, initialScrapeTime)
     await scrapperInterval.scrape()
-    clock.restore()
 
     assert(scrapeTimeSub1.saveLastScrapeTime.calledOnceWithExactly(laterDate))
  }); 
@@ -242,7 +254,7 @@ describe('Scrapper Tests',
 
     assert(scrapper1.scrape.calledOnceWithExactly({...options, startDate: initialScrapeTime}, credentials))
   });
-  it('if publish fail for one of the transactions, should save the previous date ', async () => {
+  it('if publish fail for one of the transactions, should save the previous date', async () => {
     // TODO
   })
 });

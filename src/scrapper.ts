@@ -69,16 +69,19 @@ class IntervalScrapper {
                 )
             }
 
-            const latestTransaction = last(transactionsDate)
-            if (latestTransaction && latestTransaction.date > currentDate) {
-                await this.scrapeTime.saveLastScrapeTime(latestTransaction.date)
+            let timeToUpdate: Date
+            if (transactionsDate.length > 0){
+                timeToUpdate = last(transactionsDate).date
             } else {
-                try{
-                    await this.scrapeTime.saveLastScrapeTime(currentDate)
-                } catch (error) {
-                    this.logger.log(`Error updating scrapping date, message: ${error}`, 'error')
-                }
+                timeToUpdate = currentDate
             }
+
+            try{
+                await this.scrapeTime.saveLastScrapeTime(timeToUpdate)
+            } catch (error) {
+                this.logger.log(`Error updating scrapping date, message: ${error}`, 'error')
+            }
+
         } else {
             this.logger.log(`Error scrapping ${this.options.companyId}, type: ${result?.errorType}, message: ${result.errorMessage}`, 'error')
         }
