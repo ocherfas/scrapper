@@ -53,25 +53,29 @@ class IntervalScrapper {
 
         if (result.success){
             const transactions = result.accounts?.[0]?.txns ?? []
-            const transactionsDate = transactions.map((transaction) => {
-                return {
-                    ...transaction,
-                    date: new Date(transaction.date)
-                }
-            })
-
-            const orderedTransactions = orderBy(transactionsDate, transaction => transaction.date)
-            for (const transaction of orderedTransactions){
-                await this.publisher.publish(
-                    new Date(transaction.date), 
-                    transaction.description, 
-                    transaction.chargedAmount
-                )
-            }
-
             let timeToUpdate: Date
-            if (transactionsDate.length > 0){
-                timeToUpdate = last(transactionsDate).date
+            if (transactions.length > 0){
+                const transactionsDate = transactions.map((transaction) => {
+                    return {
+                        ...transaction,
+                        date: new Date(transaction.date)
+                    }
+                })
+
+                const orderedTransactions = orderBy(transactionsDate, transaction => transaction.date)
+                for (const transaction of orderedTransactions){
+                    try{
+                        await this.publisher.publish(
+                            new Date(transaction.date), 
+                            transaction.description, 
+                            transaction.chargedAmount
+                        )
+                        timeToUpdate = transaction.date
+                    } catch (error){
+                        this.logger.log(`Error publishing transaction ${transaction.description}, message: ${error}`, 'error')
+                        break;
+                    }
+                }
             } else {
                 timeToUpdate = currentDate
             }

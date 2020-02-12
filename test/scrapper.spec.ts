@@ -239,7 +239,7 @@ describe('Scrapper Tests',
     const scrapperInterval = new IntervalScrapper(options, scrapeTime1, scrapper1, credentials, publisherStub, logger1, initialScrapeTime)
     await scrapperInterval.scrape()
 
-    assert(logger.log.calledWith(sinon.match.any, 'error'))
+    assert(logger1.log.calledWith(sinon.match.any, 'error'))
   }); 
   it('if no last scrape time, scrape with provided initial scrape time', async () => {
     const initialScrapeTime = new Date()
@@ -254,7 +254,79 @@ describe('Scrapper Tests',
 
     assert(scrapper1.scrape.calledOnceWithExactly({...options, startDate: initialScrapeTime}, credentials))
   });
-  it('if publish fail for one of the transactions, should save the previous date', async () => {
-    // TODO
+  it('if publish fail for one of the transactions, should save the previous date and log error', async () => {
+    const scrapperStub1 = stubInterface<IIsraeliScrapper>()
+    const scrapeTimeSub1 = stubInterface<IScrapeTime>()
+    const publisherStub1 = stubInterface<IPublisher>()
+    const logger1 = stubInterface<ILogger>()
+
+    const firstDate = new Date()
+    const laterDate = new Date(firstDate)
+    const lastDate = new Date(firstDate)
+    laterDate.setSeconds(laterDate.getSeconds() + 20)
+    lastDate.setSeconds(lastDate.getSeconds() + 40)
+    const firstTransaction: Transaction = {
+      type: 'normal',
+      date: firstDate.toISOString(), // ISO date string
+      processedDate: "", // ISO date string
+      originalAmount: 20,
+      originalCurrency: "",
+      chargedAmount: 100,
+      description: "first transaction",
+      installments: {
+          number: 10, // the current installment number
+          total: 20, // the total number of installments
+      },
+      status: 'completed'
+    }
+    const laterTransaction: Transaction = {
+      type: 'normal',
+      date: laterDate.toISOString(), // ISO date string
+      processedDate: "", // ISO date string
+      originalAmount: 20,
+      originalCurrency: "",
+      chargedAmount: 100,
+      description: "later transaction",
+      installments: {
+          number: 10, // the current installment number
+          total: 20, // the total number of installments
+      },
+      status: 'completed'
+    }
+    const lastTransaction: Transaction = {
+      type: 'normal',
+      date: lastDate.toISOString(), // ISO date string
+      processedDate: "", // ISO date string
+      originalAmount: 20,
+      originalCurrency: "",
+      chargedAmount: 100,
+      description: "last transaction",
+      installments: {
+          number: 10, // the current installment number
+          total: 20, // the total number of installments
+      },
+      status: 'completed'
+    }
+
+    const scrapeResultPromise = new Promise<ScrapeResult>((resolve) => {
+      resolve({
+        success: true,
+        accounts: [{
+          accountNumber: "",
+          txns: [
+            laterTransaction, firstTransaction, lastTransaction
+          ]
+        }]
+      })
+    })     
+
+    scrapperStub1.scrape.returns(scrapeResultPromise)
+    publisherStub1.publish.onSecondCall().throwsException()
+
+    const scrapperInterval = new IntervalScrapper(options, scrapeTimeSub1, scrapperStub1, credentials, publisherStub1, logger1, initialScrapeTime)
+    await scrapperInterval.scrape()
+
+    assert(scrapeTimeSub1.saveLastScrapeTime.calledOnceWithExactly(firstDate))
+    assert(logger1.log.calledWith(sinon.match.any, 'error'))
   })
 });
