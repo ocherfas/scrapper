@@ -40,5 +40,5 @@ export interface IPublisher {
 }
 
 export interface ILogger {
-    log(error: string, severity: 'info'| 'debug' | 'error')
+    log(message: string, severity: 'info'| 'debug' | 'error')
 }

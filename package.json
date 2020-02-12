@@ -13,6 +13,7 @@
     "@types/lodash": "^4.14.149",
     "@types/node": "^13.7.0",
     "@types/sendmail": "^1.4.2",
+    "console-stamp": "^0.2.9",
     "dotenv": "^8.2.0",
     "fs-extra": "^8.1.0",
     "israeli-bank-scrapers": "^0.8.0",
