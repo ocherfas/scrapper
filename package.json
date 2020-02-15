@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha -r ts-node/register test/**/**.spec.ts"
+    "test": "mocha -r ts-node/register test/**/**.spec.ts",
+    "start": "ts-node ./src/index.ts"
   },
   "author": "",
   "license": "ISC",
