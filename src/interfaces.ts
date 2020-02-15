@@ -38,7 +38,3 @@ export interface IIsraeliScrapper {
 export interface IPublisher {
     publish(date: Date, description: string, chargedAmount: number): Promise<void>
 }
-
-export interface ILogger {
-    log(message: string, severity: 'info'| 'debug' | 'error')
-}

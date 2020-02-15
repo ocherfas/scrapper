@@ -1,4 +1,4 @@
-import {IScrapeTime, IIsraeliScrapper, Credentials, IPublisher, ILogger} from './interfaces'
+import {IScrapeTime, IIsraeliScrapper, Credentials, IPublisher} from './interfaces'
 import {orderBy, last} from 'lodash'
 
 
@@ -8,7 +8,6 @@ class IntervalScrapper {
     israeliScrapper: IIsraeliScrapper
     credentials: Credentials
     publisher: IPublisher
-    logger: ILogger
     initialScrapeTime: Date
 
     constructor(
@@ -17,7 +16,6 @@ class IntervalScrapper {
         israeliScrapper: IIsraeliScrapper, 
         credentials: Credentials, 
         publisher: IPublisher,
-        logger: ILogger,
         initialScrapeTime: Date
     ){
         this.options = options
@@ -25,7 +23,6 @@ class IntervalScrapper {
         this.israeliScrapper = israeliScrapper
         this.credentials = credentials
         this.publisher = publisher
-        this.logger = logger
         this.initialScrapeTime = initialScrapeTime
     }
 
@@ -35,7 +32,7 @@ class IntervalScrapper {
         try{
             lastScrapeTime = await this.scrapeTime.getLastScrapeTime()
         } catch (error) {
-            this.logger.log(`Could not get last scrape time due to: ${error}`, 'error')
+            console.error(`Could not get last scrape time due to: ${error}`, 'error')
             return
         }
 
@@ -47,7 +44,7 @@ class IntervalScrapper {
         const result = (await this.israeliScrapper.scrape({...this.options, startDate: lastScrapeTime}, this.credentials))
         
         if (!result) {
-            this.logger.log(`Error scrapping ${this.options.companyId}, did not get result`, 'error')
+            console.error(`Error scrapping ${this.options.companyId}, did not get result`)
             return
         }
 
@@ -72,7 +69,7 @@ class IntervalScrapper {
                         )
                         timeToUpdate = transaction.date
                     } catch (error){
-                        this.logger.log(`Error publishing transaction ${transaction.description}, message: ${error}`, 'error')
+                        console.error(`Error publishing transaction ${transaction.description}, message: ${error}`)
                         break;
                     }
                 }
@@ -83,11 +80,11 @@ class IntervalScrapper {
             try{
                 await this.scrapeTime.saveLastScrapeTime(timeToUpdate)
             } catch (error) {
-                this.logger.log(`Error updating scrapping date, message: ${error}`, 'error')
+                console.error(`Error updating scrapping date, message: ${error}`)
             }
 
         } else {
-            this.logger.log(`Error scrapping ${this.options.companyId}, type: ${result?.errorType}, message: ${result.errorMessage}`, 'error')
+            console.error(`Error scrapping ${this.options.companyId}, type: ${result?.errorType}, message: ${result.errorMessage}`)
         }
     }
 }
