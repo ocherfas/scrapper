@@ -27,12 +27,12 @@
             "name": "Launch Program",
             "type": "node",
             "request": "launch",
-            "args": ["${workspaceFolder}/index.ts"],
-            "runtimeArgs": ["--nolazy", "-r", "ts-node/register"],
+            "args": ["${workspaceFolder}/src/index.ts"],
+            "runtimeArgs": ["--nolazy", "-r", "ts-node/register", "--harmony"],
             "sourceMaps": true,
             "cwd": "${workspaceRoot}",
+            "smartStep": false,
             "protocol": "inspector",
-            "smartStep": false
         },
          
     ]

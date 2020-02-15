@@ -1,12 +1,11 @@
 require('dotenv').config()
-const { createScraper } = require('israeli-bank-scrapers');
-
-console.log('start to scrape')
-const date = Date.parse('26 Jan 2020 00:00:00 GMT');
+import israeliScraper from './israeliScrapers'
+import ScrapeTime from './scrapeTime'
+import EmailPublisher from './emailPublisher'
+import Scraper from './scrapper'
 
 const options = {
     companyId: 'otsarHahayal', // mandatory; one of 'hapoalim', 'hapoalimBeOnline', leumi', 'discount', 'mizrahi', 'otsarHahayal', 'visaCal', 'max', 'isracard', 'amex'
-    startDate: date, // the date to fetch transactions from (can't be before the minimum allowed time difference for the scraper)
     // combineInstallments: boolean, // if set to true, all installment transactions will be combine into the first one
     // showBrowser: boolean, // shows the browser while scraping, good for debugging (default false)
     verbose: true, // include more debug info about in the output
@@ -19,22 +18,20 @@ const credentials = {
     password: process.env.PASSWORD
 }; // different for each bank
 
-(async function() {
-    try {
-       const scraper = createScraper(options);
-       const scrapeResult = await scraper.scrape(credentials);
-    
-       if (scrapeResult.success) {
-         scrapeResult.accounts.forEach((account) => {
-            console.log(`found ${account.txns.length} transactions for account number 
-             ${account.accountNumber}`);
-         });
-       }
-       else {
-          throw new Error(scrapeResult.errorType);
-       }
-    } catch(e) {
-       console.error(`scraping failed for the following reason: ${e.message}`);
-    }
- })();
+const publisher = new EmailPublisher({
+   to: "ocherfas@gmail.com",
+   from: "noone@noone.com"
+});
 
+const scrapeTime = new ScrapeTime("./scrapeTime");
+const date = new Date()
+date.setMinutes(date.getMinutes() - 1)
+const scraper = new Scraper(options, scrapeTime, israeliScraper, credentials, publisher, date);
+(async function() {
+   try{
+      await scraper.scrape()
+      console.log('scraped')
+   } catch(error){
+      console.log('no ok')
+   }
+})();

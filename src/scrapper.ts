@@ -1,8 +1,8 @@
 import {IScrapeTime, IIsraeliScrapper, Credentials, IPublisher} from './interfaces'
-import {orderBy, last} from 'lodash'
+import {orderBy } from 'lodash'
 
 
-class IntervalScrapper {
+export default class IntervalScrapper {
     options: any
     scrapeTime: IScrapeTime
     israeliScrapper: IIsraeliScrapper
@@ -41,7 +41,14 @@ class IntervalScrapper {
         }
         
         const currentDate = new Date()
-        const result = (await this.israeliScrapper.scrape({...this.options, startDate: lastScrapeTime}, this.credentials))
+        
+        let result
+        try{
+            result = await this.israeliScrapper.scrape({...this.options, startDate: lastScrapeTime}, this.credentials)
+        } catch(error){
+            console.error(`Error scrapping ${this.options.companyId}: ${error}`)
+            return
+        }
         
         if (!result) {
             console.error(`Error scrapping ${this.options.companyId}, did not get result`)
@@ -88,6 +95,4 @@ class IntervalScrapper {
         }
     }
 }
-
-export {IntervalScrapper}
 

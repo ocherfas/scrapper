@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import 'mocha';
-import {IntervalScrapper} from '../src/scrapper'
+import IntervalScrapper from '../src/scrapper'
 import {IScrapeTime, IIsraeliScrapper, IPublisher, ScrapeResult, Transaction} from '../src/interfaces'
 import sinon, { stubInterface } from "ts-sinon";
 
@@ -330,4 +330,14 @@ describe('Scrapper Tests',
     assert(scrapeTimeSub1.saveLastScrapeTime.calledOnceWithExactly(firstDate))
     assert(consoleStub.called)
   })
+  it('if scrapper throw exception, write error to console.error', async () => {
+    const consoleStub = sinon.stub(console, 'error')
+    const scrapper1 = stubInterface<IIsraeliScrapper>()
+    scrapper1.scrape.throwsException()
+
+    const scrapperInterval = new IntervalScrapper(options, scrapeTimeStub, scrapper1, credentials, publisherStub, initialScrapeTime)
+    await scrapperInterval.scrape()
+
+    assert(consoleStub.called)
+  });
 });
