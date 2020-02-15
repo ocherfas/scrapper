@@ -31,7 +31,7 @@ describe('scrapeTime tests - getLastScrapeTimeTest',
             assert(accessStub.calledWithExactly(path))
             assert(readJsonStub.calledWithExactly(path))
         })
-        it('data is not in correct foramt, should throw error', async () => {
+        it('data is not a string foramt, should throw error', async () => {
             const accessStub = ImportMock.mockFunction(fs.promises, 'access')
             const readJsonStub = ImportMock.mockFunction(fs, 'readJSON', 40)
 
@@ -47,16 +47,31 @@ describe('scrapeTime tests - getLastScrapeTimeTest',
             
             assert(thrown)
         })
-        it('data is a date, should return it', async () => {
+        it('data is not a string not in correct foramt, should throw error', async () => {
+            const accessStub = ImportMock.mockFunction(fs.promises, 'access')
+            const readJsonStub = ImportMock.mockFunction(fs, 'readJSON', "40,jnsdf")
+
+            const scrapeTime = new ScrapeTime("")
+
+            let thrown
+            try{
+                await scrapeTime.getLastScrapeTime()
+                thrown = false
+            } catch(error){
+                thrown = true
+            }
+            
+            assert(thrown)
+        })
+        it('data is a date string, should return it', async () => {
             const accessStub = ImportMock.mockFunction(fs.promises, 'access')
             const date = new Date()
-            const readJsonStub = ImportMock.mockFunction(fs, 'readJSON', date)
+            const readJsonStub = ImportMock.mockFunction(fs, 'readJSON', date.toISOString())
 
             const scrapeTime = new ScrapeTime("")
 
             const result = await scrapeTime.getLastScrapeTime()
-            
-            assert.equal(result, date)
+            assert.equal(result.getTime(), date.getTime())
         })
         it('use provided path and object to save last scrape time', async () => {
             const path = "test-path"
