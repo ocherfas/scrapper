@@ -27,12 +27,10 @@
             "name": "Launch Program",
             "type": "node",
             "request": "launch",
-            "args": ["${workspaceFolder}/src/index.ts"],
-            "runtimeArgs": ["--nolazy", "-r", "ts-node/register", "--harmony"],
+            // "preLaunchTask": "tsc: build - tsconfig.json",
+            "args": ["${workspaceFolder}/bin/index.js"],
             "sourceMaps": true,
             "cwd": "${workspaceRoot}",
-            "smartStep": false,
-            "protocol": "inspector",
         },
          
     ]

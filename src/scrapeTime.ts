@@ -1,33 +1,29 @@
 import {IScrapeTime} from './interfaces'
 import fs from 'fs-extra'
+import path from 'path'
 
 export default class ScrapeTime implements IScrapeTime {
 
-    lastScrapeTimeFile: string
-    constructor(lastScrapeTimeFile: string){
-        this.lastScrapeTimeFile = lastScrapeTimeFile
-    }
+    constructor(private storageFolder: string){}
 
-    async getLastScrapeTime(){
-        try{
-            await fs.promises.access(this.lastScrapeTimeFile)
+    async dateTransactions(date: Date){
+        try {
+            const ids = await fs.readJSON(this.pathForDate(date))
+            return (ids as number[]) || []
         } catch(error){
-            return null
+            return []
         }
-
-        const data =  await fs.readJSON(this.lastScrapeTimeFile)
-        if (typeof(data) === typeof('')) {
-            const date = new Date(data as string)
-            if(isNaN(date.getTime())){
-                throw new Error(`Could not get last scrape time from file ${this.lastScrapeTimeFile}`) 
-            } else {
-                return date    
-            }
-        } else throw new Error(`Could not get last scrape time from file ${this.lastScrapeTimeFile}`)
     }
 
-    async saveLastScrapeTime(date: Date){
-        await fs.writeJSON(this.lastScrapeTimeFile, date, {})
+    async addTransactions(date: Date, ids: number[]){
+        const currentIds = await this.dateTransactions(date)
+        await fs.ensureDir(this.storageFolder)
+        return fs.writeJSON(this.pathForDate(date), [...currentIds, ...ids], {flag: "w"})
+    }
+
+    pathForDate(date: Date){
+        const dateString = date.toLocaleDateString()
+        return path.join(this.storageFolder, dateString)
     }
 }
  

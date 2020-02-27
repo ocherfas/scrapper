@@ -1,6 +1,6 @@
 export interface IScrapeTime {
-    getLastScrapeTime(): Promise<Date>
-    saveLastScrapeTime(scrapeTime: Date): Promise<void>
+    dateTransactions(date: Date): Promise<number[]>
+    addTransactions(date: Date, ids: number[]): Promise<void>
 }
 
 export type Credentials = {username: string, password: string}

@@ -2,6 +2,7 @@ require('dotenv').config()
 import israeliScraper from './israeliScrapers'
 import ScrapeTime from './scrapeTime'
 import EmailPublisher from './emailPublisher'
+import ConsolePublisher from './consolePublisher'
 import Scraper from './scrapper'
 
 const options = {
@@ -14,24 +15,24 @@ const options = {
   }
 
 const credentials = {
-    username: process.env.USERNAME,
-    password: process.env.PASSWORD
+    username: process.env.BANK_USERNAME,
+    password: process.env.BANK_PASSWORD
 }; // different for each bank
 
-const publisher = new EmailPublisher({
-   to: "ocherfas@gmail.com",
-   from: "noone@noone.com"
-});
+// const publisher = new EmailPublisher({
+//    to: "ocherfas@gmail.com",
+//    from: "noone@noone.com"
+// });
 
-const scrapeTime = new ScrapeTime("./scrapeTime");
-const date = new Date()
-date.setMinutes(date.getMinutes() - 1)
-const scraper = new Scraper(options, scrapeTime, israeliScraper, credentials, publisher, date);
+const publisher = new ConsolePublisher()
+
+const scrapeTime = new ScrapeTime("./scrapeDates");
+const scraper = new Scraper(options, scrapeTime, israeliScraper, credentials, publisher);
 (async function() {
    try{
       await scraper.scrape()
       console.log('scraped')
    } catch(error){
-      console.log('no ok')
+      console.log(`no ok: ${error}`)
    }
 })();
