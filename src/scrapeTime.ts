@@ -18,7 +18,7 @@ export default class ScrapeTime implements IScrapeTime {
     async addTransactions(subFolder: string, date: Date, ids: number[]){
         const currentIds = await this.dateTransactions(subFolder, date)
         await fs.ensureDir(path.join(this.storageFolder, subFolder))
-        return fs.writeJSON(this.pathForDate(subFolder, date), [...currentIds, ...ids], {flag: "w"})
+        return fs.writeJSON(this.pathForDate(subFolder, date), [...currentIds, ...ids])
     }
 
     pathForDate(subFolder: string, date: Date){
