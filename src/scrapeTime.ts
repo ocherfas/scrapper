@@ -6,24 +6,24 @@ export default class ScrapeTime implements IScrapeTime {
 
     constructor(private storageFolder: string){}
 
-    async dateTransactions(date: Date){
+    async dateTransactions(subFolder: string, date: Date){
         try {
-            const ids = await fs.readJSON(this.pathForDate(date))
+            const ids = await fs.readJSON(this.pathForDate(subFolder, date))
             return (ids as number[]) || []
         } catch(error){
             return []
         }
     }
 
-    async addTransactions(date: Date, ids: number[]){
-        const currentIds = await this.dateTransactions(date)
-        await fs.ensureDir(this.storageFolder)
-        return fs.writeJSON(this.pathForDate(date), [...currentIds, ...ids], {flag: "w"})
+    async addTransactions(subFolder: string, date: Date, ids: number[]){
+        const currentIds = await this.dateTransactions(subFolder, date)
+        await fs.ensureDir(path.join(this.storageFolder, subFolder))
+        return fs.writeJSON(this.pathForDate(subFolder, date), [...currentIds, ...ids], {flag: "w"})
     }
 
-    pathForDate(date: Date){
+    pathForDate(subFolder: string, date: Date){
         const dateString = date.toLocaleDateString()
-        return path.join(this.storageFolder, dateString)
+        return path.join(this.storageFolder, subFolder, dateString)
     }
 }
  

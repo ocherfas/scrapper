@@ -1,0 +1,15 @@
+{
+    "scrappers": [
+        {
+            "companyId": "otsarHahayal",
+            "username": "username",
+            "password": "password"
+        }
+    ],
+    "publisher": {
+        "to": "email to send to",
+        "from": "email address to send from",
+        "subject": "New Transaction"
+    },
+    "storagePath": "./scrapeDates"
+}

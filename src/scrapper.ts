@@ -27,7 +27,7 @@ export default class IntervalScrapper {
         }
 
         if (result.success) {
-            const currentDateTransactions = await this.scrapeTime.dateTransactions(currentDate)
+            const currentDateTransactions = await this.scrapeTime.dateTransactions(this.options.companyId, currentDate)
             const transactions: any[] = result.accounts?.[0]?.txns ?? []
 
             const newTransactions = transactions.filter(txn => !currentDateTransactions.includes(txn.identifier))
@@ -45,7 +45,7 @@ export default class IntervalScrapper {
                 }
             }
 
-            await this.scrapeTime.addTransactions(currentDate, successPublish.map(txn => txn.identifier))
+            await this.scrapeTime.addTransactions(this.options.companyId, currentDate, successPublish.map(txn => txn.identifier))
 
         } else {
             console.error(`Error scrapping ${this.options.companyId}, type: ${result?.errorType}, message: ${result.errorMessage}`)

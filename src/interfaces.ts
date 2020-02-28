@@ -1,6 +1,6 @@
 export interface IScrapeTime {
-    dateTransactions(date: Date): Promise<number[]>
-    addTransactions(date: Date, ids: number[]): Promise<void>
+    dateTransactions(subFolder: string, date: Date): Promise<number[]>
+    addTransactions(subFolder: string, date: Date, ids: number[]): Promise<void>
 }
 
 export type Credentials = {username: string, password: string}
