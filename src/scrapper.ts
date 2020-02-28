@@ -31,15 +31,21 @@ export default class IntervalScrapper {
             const transactions: any[] = result.accounts?.[0]?.txns ?? []
 
             const newTransactions = transactions.filter(txn => !currentDateTransactions.includes(txn.identifier))
+            const successPublish = []
             for (const txn of newTransactions){
-                await this.publisher.publish(
-                    new Date(txn.date), 
-                    txn.description, 
-                    txn.chargedAmount
-                )
+                try{
+                    await this.publisher.publish(
+                        new Date(txn.date), 
+                        txn.description, 
+                        txn.chargedAmount
+                    )
+                    successPublish.push(txn)
+                } catch(error){
+                    console.error(`Error publishing transaction ${txn.identifier}: ${error}`)
+                }
             }
 
-            await this.scrapeTime.addTransactions(currentDate, newTransactions.map(txn => txn.identifier))
+            await this.scrapeTime.addTransactions(currentDate, successPublish.map(txn => txn.identifier))
 
         } else {
             console.error(`Error scrapping ${this.options.companyId}, type: ${result?.errorType}, message: ${result.errorMessage}`)
