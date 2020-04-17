@@ -7,7 +7,7 @@
     "build": "tsc",
     "test": "mocha -r ts-node/register test/**/**.spec.ts",
     "start": "npm run build && node ./bin/index.js",
-    "build-docker": "npm install && npm run build && docker build . -t scrapper"
+    "build-docker": "npm install && npm run build && docker build . -t ocherfas/scrapper"
   },
   "author": "",
   "license": "ISC",
