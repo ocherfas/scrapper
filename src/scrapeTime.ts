@@ -22,7 +22,7 @@ export default class ScrapeTime implements IScrapeTime {
     }
 
     pathForDate(subFolder: string, date: Date){
-        const dateString = date.toLocaleDateString()
+        const dateString = date.toDateString()
         return path.join(this.storageFolder, subFolder, dateString)
     }
 }

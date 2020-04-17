@@ -21,6 +21,7 @@ const configPath = process.env.CONFIG_PATH || "./config.json";
    }
 
    try{
+      scrapeOnce()
       const task = cron.schedule("* * * * *", scrapeOnce) // scrape every minute
       task.start()
    }catch (error){
