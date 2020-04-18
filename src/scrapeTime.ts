@@ -1,6 +1,7 @@
 import {IScrapeTime} from './interfaces'
 import fs from 'fs-extra'
 import path from 'path'
+import moment from 'moment'
 
 export default class ScrapeTime implements IScrapeTime {
 
@@ -22,7 +23,8 @@ export default class ScrapeTime implements IScrapeTime {
     }
 
     pathForDate(subFolder: string, date: Date){
-        const dateString = date.toDateString()
+        const momentFromDate = moment(date)
+        const dateString = momentFromDate.format("YYYY-MM-DD")
         return path.join(this.storageFolder, subFolder, dateString)
     }
 }
