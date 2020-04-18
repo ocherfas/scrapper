@@ -1,0 +1,10 @@
+version: '3'
+services:
+  scrapper:
+    image: "ocherfas/scrapper"
+    restart: always
+    volumes: 
+        - ./config.json:/scrapper/config.json
+        - ./scrapeDates:/scrapeDates
+    environment:
+        CONFIG_PATH: /scrapper/config.json
