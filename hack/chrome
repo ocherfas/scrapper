@@ -1,2 +1,2 @@
-#!/bin/bash
-$(dirname "$0")/chrome-real --no-sandbox "$@"
+#!/bin/sh
+$(dirname "$0")/chromium-browser --no-sandbox "$@"
