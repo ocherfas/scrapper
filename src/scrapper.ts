@@ -6,7 +6,7 @@ export default class IntervalScrapper {
         private scrapeTime: IScrapeTime, 
         private israeliScrapper: IIsraeliScrapper, 
         private credentials: Credentials, 
-        private publisher: IPublisher,  
+        private publishers: IPublisher[],  
     ){}
 
     async scrape(){
@@ -33,15 +33,13 @@ export default class IntervalScrapper {
             const newTransactions = transactions.filter(txn => !currentDateTransactions.includes(txn.identifier))
             const successPublish = []
             for (const txn of newTransactions){
-                try{
-                    await this.publisher.publish(
-                        new Date(txn.date), 
-                        txn.description, 
-                        txn.chargedAmount
-                    )
-                    successPublish.push(txn)
-                } catch(error){
-                    console.error(`Error publishing transaction ${txn.identifier}: ${error}`)
+                const transactionMessage = `Transaction with amount ${txn.chargedAmount} with description '${txn.description}' was received on ${new Date(txn.date)}`
+                for (const publisher of this.publishers){
+                    try{
+                        await publisher.publish(transactionMessage)
+                    } catch(error){
+                        console.error(`Error publishing transaction:\nPublisher:${publisher.publisherDescription()}\nTransaction: ${txn.identifier}: ${error}`)    
+                    }
                 }
             }
 

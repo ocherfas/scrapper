@@ -20,13 +20,17 @@ export default class EmailPublisher implements IPublisher{
         this.options = {...defaults, ...options}
     }
 
-    publish(date: Date, description: string, chargedAmount: number) {
+    publisherDescription(){
+        return `email publisher to ${this.options.to}`
+    }
+
+    publish(message: string) {
         return new Promise<void>((resolve, reject) => {
             sendmail({
                 from: this.options.from,
                 to: this.options.to,
                 subject: this.options.subject,
-                html: `Transaction with amount ${chargedAmount} with description '${description}' was received on ${date}`,
+                html: message,
             }, (err, domain) => {
                 if (err != null) {
                     reject(err)

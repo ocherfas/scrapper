@@ -36,5 +36,6 @@ export interface IIsraeliScrapper {
 }
 
 export interface IPublisher {
-    publish(date: Date, description: string, chargedAmount: number): Promise<void>
+    publisherDescription(): string
+    publish(message: string): Promise<void>
 }

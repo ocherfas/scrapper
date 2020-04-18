@@ -6,10 +6,16 @@
             "password": "password"
         }
     ],
-    "publisher": {
-        "to": "email to send to",
-        "from": "email address to send from",
-        "subject": "New Transaction"
-    },
+    "publishers": [
+        {
+            "to": "email to send to",
+            "from": "email address to send from",
+            "subject": "New Transaction"
+        },
+        {
+            "chatId": "chatId",
+            "token": "some token"
+        }
+    ],
     "storagePath": "./scrapeDates"
 }
