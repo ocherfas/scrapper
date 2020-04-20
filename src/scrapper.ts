@@ -10,12 +10,13 @@ export default class IntervalScrapper {
     ){}
 
     async scrape(){
-        const currentDate = new Date()
+        const dateTimeSearchFrom = new Date()
+        dateTimeSearchFrom.setDate(dateTimeSearchFrom.getDate() - 2) // start scrapping from two days ago
         // TODO - maybe use the previous day to start the scrape
 
         let result
         try{
-            result = await this.israeliScrapper.scrape({...this.options, startDate: currentDate}, this.credentials)
+            result = await this.israeliScrapper.scrape({...this.options, startDate: dateTimeSearchFrom}, this.credentials)
         } catch(error){
             console.error(`Error scrapping ${this.options.companyId}: ${error}`)
             return
@@ -27,7 +28,7 @@ export default class IntervalScrapper {
         }
 
         if (result.success) {
-            const currentDateTransactions = await this.scrapeTime.dateTransactions(this.options.companyId, currentDate)
+            const currentDateTransactions = await this.scrapeTime.dateTransactions(this.options.companyId, dateTimeSearchFrom)
             const transactions: any[] = result.accounts?.[0]?.txns ?? []
 
             const newTransactions = transactions.filter(txn => !currentDateTransactions.includes(txn.identifier))
@@ -43,7 +44,7 @@ export default class IntervalScrapper {
                 }
             }
 
-            await this.scrapeTime.addTransactions(this.options.companyId, currentDate, successPublish.map(txn => txn.identifier))
+            await this.scrapeTime.addTransactions(this.options.companyId, dateTimeSearchFrom, successPublish.map(txn => txn.identifier))
 
         } else {
             console.error(`Error scrapping ${this.options.companyId}, type: ${result?.errorType}, message: ${result.errorMessage}`)
