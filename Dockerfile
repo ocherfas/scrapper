@@ -10,10 +10,8 @@ RUN apk add --no-cache \
       nodejs \
       npm
 
-COPY ./hack/chrome /usr/bin/chromium-browser-custom
-
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser-custom
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 WORKDIR /scrapper
 COPY package.json package-lock.json ./
