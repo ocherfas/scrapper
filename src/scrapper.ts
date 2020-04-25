@@ -7,7 +7,11 @@ export default class IntervalScrapper {
         private israeliScrapper: IIsraeliScrapper, 
         private credentials: Credentials, 
         private publishers: IPublisher[],  
-    ){}
+    ){
+        this.companyId = this.options.companyId
+    }
+
+    public readonly companyId;
 
     async scrape(){
         const dateTimeSearchFrom = new Date()

@@ -12,7 +12,11 @@ const configPath = process.env.CONFIG_PATH || "./config.json";
    const scrapeOnce = async () => {
       try{
          console.log(`Starting to scrape`)
-         await Promise.all(scrapers.map(scrapper => scrapper.scrape()))
+         await Promise.all(scrapers.map(async scrapper => {
+            console.log(`scrapping for ${scrapper.companyId}`)
+            await scrapper.scrape()
+            console.log(`Ended scrapping for ${scrapper.companyId}`)
+         }))
 
          console.log('scraped')
       } catch(error) {
