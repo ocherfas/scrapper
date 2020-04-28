@@ -4,10 +4,11 @@
   "description": "",
   "main": "./src/index.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "npm install && npm run build",
     "test": "mocha -r ts-node/register test/**/**.spec.ts",
     "start": "npm run build && node ./bin/index.js",
-    "build-docker": "npm install && npm run build && docker build . -t ocherfas/scrapper"
+    "build-docker": "npm run build && docker build . -t ocherfas/scrapper",
+    "release-heroku": "npm run build && heroku container:push worker -a ocherfas-scrapper && heroku container:release -a ocherfas-scrapper worker"
   },
   "author": "",
   "license": "ISC",
