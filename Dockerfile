@@ -19,5 +19,7 @@ WORKDIR /scrapper
 COPY package.json package-lock.json ./
 RUN npm install
 COPY bin/ ./bin/ 
+#should be removed once new version of israeli-bank-scrapper has a new version
+COPY dependencies/ ./dependencies/
 COPY config.json ./
 ENTRYPOINT ["node", "./bin/index.js"]
